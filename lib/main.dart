@@ -3,12 +3,8 @@ import 'package:provider/provider.dart';
 
 import 'homePage.dart';
 
-void main() {
-  return runApp(MultiProvider(providers: [
-    ChangeNotifierProvider.value(value: AppState(),)
-  ],
-    child: MyApp(),));
-}
+void main() => runApp(MyApp());
+
 
 class MyApp extends StatelessWidget {
   @override
