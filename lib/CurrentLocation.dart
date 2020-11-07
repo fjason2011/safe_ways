@@ -5,14 +5,14 @@ import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 
 
 
-class HomePage extends StatefulWidget {
+class CurrentLocation extends StatefulWidget {
   @override
   State<StatefulWidget> createState()  {
-    return _HomePageState();
+    return _CurrentLocation();
   }
 }
 
-class _HomePageState extends State<HomePage> {
+class _CurrentLocation extends State<CurrentLocation> {
 
   LatLng _initialPosition = LatLng(34.0522, -118.2437);
   GoogleMapController _controller;
@@ -28,19 +28,19 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        body: Stack(
-          children: <Widget>[
-            GoogleMap(
-              initialCameraPosition:
-              CameraPosition(target: _initialPosition, zoom: 10),
-              onMapCreated: _onMapCreated,
-              myLocationEnabled: true,
-            ),
-          ],
-        ),
-      );
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          GoogleMap(
+            initialCameraPosition:
+            CameraPosition(target: _initialPosition, zoom: 10),
+            onMapCreated: _onMapCreated,
+            myLocationEnabled: true,
+          ),
+        ],
+      ),
+    );
   }
+}
