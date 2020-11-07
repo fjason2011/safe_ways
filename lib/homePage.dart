@@ -13,6 +13,7 @@ class _HomePageState extends State<HomePage> {
   LatLng _initialPosition = LatLng(34.0522, -118.2437);
   GoogleMapController _controller;
   Location _location = Location();
+  int _menuIndex = 0;
 
   void _onMapCreated(GoogleMapController _ctrl) {
     _controller = _ctrl;
@@ -38,7 +39,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
+        currentIndex: _menuIndex,
         /*
           Navigation Colors by Metro Rail Stations:
             Gold: 0xffae08, (255,174,8)
@@ -53,49 +54,54 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.home,
-                color: Color.fromRGBO(255,174,8, 1.0),
+                color: Color.fromRGBO(255,255,255,1.0),
                 semanticLabel: "Home",
               ),
               label: "Home",
-              backgroundColor: Color.fromRGBO(195,195,195,0.5)
+              backgroundColor:Color.fromRGBO(255,174,8, 1.0)
           ),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.my_location,
-                color: Color.fromRGBO(35,113,231,1.0),
+                color: Color.fromRGBO(255,255,255,1.0),
                 semanticLabel: "Current Location",
               ),
               label: "Location",
-              backgroundColor: Color.fromRGBO(195,195,195,0.5)
+              backgroundColor: Color.fromRGBO(35,113,231,1.0),
           ),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.directions_bike,
-                color: Color.fromRGBO(14,136,78,1.0),
+                color: Color.fromRGBO(255,255,255,1.0),
                 semanticLabel: "Metro Bike Stations",
               ),
               label: "Stations",
-              backgroundColor: Color.fromRGBO(195,195,195,0.5)
+              backgroundColor: Color.fromRGBO(14,136,78,1.0)
           ),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.timeline,
-                color: Color.fromRGBO(255,47,0,1.0),
+                color: Color.fromRGBO(255,255,255,1.0),
                 semanticLabel: "Find Directions to Bike Station",
               ),
               label: "Paths",
-              backgroundColor: Color.fromRGBO(195,195,195,0.5)
+              backgroundColor:  Color.fromRGBO(255,47,0,1.0)
           ),
           BottomNavigationBarItem(
               icon: Icon(
                 Icons.directions,
-                color: Color.fromRGBO(255,120,1,1.0),
+                color: Color.fromRGBO(255,255,255,1.0),
                 semanticLabel: "Direction Steps to Bike Station",
               ),
               label: "Directions",
-              backgroundColor: Color.fromRGBO(195,195,195,0.5)
+              backgroundColor: Color.fromRGBO(255,120,1,1.0)
           )
         ],
+        onTap: (index){
+          setState(() {
+            _menuIndex = index;
+          });
+        },
       ),
     );
   }
