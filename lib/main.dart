@@ -1,3 +1,6 @@
+import 'package:http/http.dart' as superagent;
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:safe_ways/CurrentLocation.dart';
 import 'package:safe_ways/Directions.dart';
@@ -30,15 +33,62 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _menuIndex = 0;
-  static List<Widget> _Pages = <Widget>[History(), CurrentLocation(), Stations(), Paths(), Directions()];
+  List _stationData;
+  int _currentIndex = 1;
+
+  //method that returns metro bike share api data. superagent variable name is not JS superagent module. I just named it that
+  //because I like the name and wanted to create confusion, check the imports
+  Future getStationData() async{
+    superagent.Response response = await superagent.get('https://bikeshare.metro.net/stations/json/');
+    return json.decode(response.body)['features'];
+  }
+
+  //this method is called in app startup. If you need any data or need to set data, this will be a pretty good place to start
+  //if you are using api's follow async/await promise procedure similar to JS
+  @override
+  void initState(){
+    super.initState();
+    getStationData().then((value){
+      setState(() {
+        _stationData = value;
+      });
+    });
+  }
+
+  //onTap in BottomNavigationBar is of type void Function (int) so this method is called everytime the navigation bar is pressed
+  //to update _currentIndex to the actual index of the naavigation items
+  void onTabTapped(int index){
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  //return widget of index that is called in bottom naavigation bar
+  Widget getPages(int index){
+    if(index == 0){
+      return History();
+    }
+    if(index == 1){
+      return CurrentLocation();
+    }
+    if(index == 2){
+      return Stations(_stationData);
+    }
+    if(index == 3){
+      return Paths();
+    }
+    if(index == 4){
+      return Directions();
+    }
+    return HomePage();
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _Pages[_menuIndex],
+      body: getPages(_currentIndex),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _menuIndex,
         /*
           Navigation Colors by Metro Rail Stations:
             Gold: 0xffae08, (255,174,8)
@@ -97,11 +147,8 @@ class _HomePageState extends State<HomePage> {
           ),
 
         ],
-        onTap: (index){
-          setState(() {
-            _menuIndex = index;
-          });
-        },
+        onTap: onTabTapped,
+        currentIndex: _currentIndex,
       ),
     );
   }
