@@ -46,11 +46,11 @@ class _CurrentLocation extends State<CurrentLocation> {
         position: LatLng(this._stationData[i]['properties']['latitude'], this._stationData[i]['properties']['longitude'])
       ));
     }
-    _markers.add(Marker(
-        markerId: MarkerId('testMarker'),
-        draggable: false,
-        position: LatLng(34.0485, -118.25854)
-    ));
+    // _markers.add(Marker(
+    //     markerId: MarkerId('testMarker'),
+    //     draggable: false,
+    //     position: LatLng(34.0485, -118.25854)
+    // ));
   }
 
   @override
