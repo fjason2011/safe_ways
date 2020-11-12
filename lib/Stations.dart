@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 
 class Stations extends StatefulWidget{
   List _stationData;
-  Stations(List data){
-    this._stationData = data;
-  }
+
+  //Stations Constructor
+  Stations(this._stationData);
+
+  //Create state for _Stations, calls _Stations constructor
   @override
-  State<StatefulWidget> createState(){
-    return _Stations(_stationData);
-  }
+  _Stations createState() => _Stations(this._stationData);
 }
 /*
           Navigation Colors by Metro Rail Stations:
@@ -23,42 +23,42 @@ class Stations extends StatefulWidget{
  */
 class _Stations extends State<Stations>{
   List _stationData;
-  _Stations(List data){
-    this._stationData = data;
-  }
+
+  //Stations constructor
+  _Stations(this._stationData);
 
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Metro Bike Stations")
-      ),
-      body: ListView.builder(
-        itemCount: _stationData == null ? 0 : _stationData.length,
-        itemBuilder: (BuildContext context, int index){
-          return Card(
-            child: Row(
-              children: <Widget>[
-                CircleAvatar(
-                  backgroundColor: Color.fromRGBO(195, 195, 195, 1.0),
-                  child:
-                  Text(
-                    '${_stationData[index]['properties']['bikesAvailable']}',
-                    style: TextStyle(
-                      color: Colors.white
+        appBar: AppBar(
+            title: Text("Metro Bike Stations")
+        ),
+        body: ListView.builder(
+          itemCount: _stationData == null ? 0 : _stationData.length,
+          itemBuilder: (BuildContext context, int index){
+            return Card(
+                child: Row(
+                  children: <Widget>[
+                    CircleAvatar(
+                      backgroundColor: Color.fromRGBO(195, 195, 195, 1.0),
+                      child:
+                      Text(
+                          '${_stationData[index]['properties']['bikesAvailable']}',
+                          style: TextStyle(
+                              color: Colors.white
+                          )
+                      ),
+                    ),
+                    Text('   ${_stationData[index]['properties']['addressStreet']}, ${_stationData[index]['properties']['addressCity']}, ${_stationData[index]['properties']['addressZipCode']}',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold
+                      ),
                     )
-                  ),
-                ),
-                Text('   ${_stationData[index]['properties']['addressStreet']}, ${_stationData[index]['properties']['addressCity']}, ${_stationData[index]['properties']['addressZipCode']}',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold
-                  ),
+                  ],
                 )
-              ],
-            )
-          );
-        },
-      )
+            );
+          },
+        )
     );
   }
 }
