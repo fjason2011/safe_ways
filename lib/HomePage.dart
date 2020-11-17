@@ -2,20 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:safe_ways/NavigationPage.dart';
 import 'package:safe_ways/delayed_animation.dart';
+import 'package:http/http.dart' as superagent;
+import 'dart:async';
+import 'dart:convert';
 
-//https://github.com/sagarshende23/Reflectly-Login-Screen
 //HomePage made using sagarshende23 Reflectly Login Screen splash page
+//https://github.com/sagarshende23/Reflectly-Login-Screen
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+  List _stationData; //Metro Bike Share API Data
   final int delayedAmount = 500;
   double _scale;
   AnimationController _controller;
   @override
   void initState() {
+    //Metro Bike Share API called here and saved to _stationData
+    getStationData().then((value){
+      setState(() {
+        this._stationData = value;
+      });
+    });
     _controller = AnimationController(
       vsync: this,
       duration: Duration(
@@ -29,6 +39,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     super.initState();
   }
 
+  Future getStationData() async{
+    superagent.Response response = await superagent.get('https://bikeshare.metro.net/stations/json/');
+    return json.decode(response.body)['features'];
+  }
+
   @override
   Widget build(BuildContext context) {
     final color = Colors.white;
@@ -36,29 +51,26 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-          backgroundColor: Color(0xFF8185E2),
+          backgroundColor: Color.fromRGBO(195, 195, 195, 1.0),
           body: Center(
             child: Column(
               children: <Widget>[
                 SizedBox(
-                  height: 50.0,
+                  height: 60.0,
                 ),
                 AvatarGlow(
-                  endRadius: 90,
+                  endRadius: 120,
                   duration: Duration(seconds: 2),
                   glowColor: Colors.white24,
                   repeat: true,
                   repeatPauseDuration: Duration(seconds: 2),
                   startDelay: Duration(seconds: 1),
                   child: Material(
-                      elevation: 8.0,
                       shape: CircleBorder(),
                       child: CircleAvatar(
-                        backgroundColor: Colors.grey[100],
-                        child: FlutterLogo(
-                          size: 50.0,
-                        ),
-                        radius: 50.0,
+                        backgroundColor: Color.fromRGBO(195, 195, 195, 1.0),
+                        backgroundImage: AssetImage("assets/safeways.png"),
+                        radius: 75.0,
                       )),
                 ),
                 DelayedAnimation(
@@ -104,7 +116,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 DelayedAnimation(
                   child: GestureDetector(
                     onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationPage()));
+                      //_stationData is then given to NavigationPage so the data is ready by the time the person wants to navigate through the tabs.
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationPage(this._stationData)));
                     },
                     onTapDown: _onTapDown,
                     onTapUp: _onTapUp,
@@ -137,7 +150,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         style: TextStyle(
           fontSize: 20.0,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF8185E2),
+          color: Color.fromRGBO(195, 195, 195, 1.0),
         ),
       ),
     ),

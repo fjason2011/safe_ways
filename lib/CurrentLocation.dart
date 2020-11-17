@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -38,14 +41,8 @@ class _CurrentLocation extends State<CurrentLocation> {
 
   @override
   void initState(){
+    setMarkers();
     super.initState();
-    for(int i = 0; i < this._stationData.length; i++){
-      _markers.add(Marker(
-        markerId: MarkerId(this._stationData[i]['properties']['addressStreet']),
-        draggable: false,
-        position: LatLng(this._stationData[i]['properties']['latitude'], this._stationData[i]['properties']['longitude'])
-      ));
-    }
     // _markers.add(Marker(
     //     markerId: MarkerId('testMarker'),
     //     draggable: false,
@@ -53,6 +50,39 @@ class _CurrentLocation extends State<CurrentLocation> {
     // ));
   }
 
+  void setMarkers(){
+    for(int i = 0; i < this._stationData.length; i++){
+      _addMarker(this._stationData[i]['properties']);
+    }
+  }
+
+  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png)).buffer.asUint8List();
+  }
+
+  Future<void> _addMarker(object) async {
+    final Uint8List markerIcon = await getBytesFromAsset('assets/bikemarker.png', 100);
+
+    // creating a new MARKER
+    final Marker marker = Marker(
+      icon: BitmapDescriptor.fromBytes(markerIcon),
+      markerId:  MarkerId(object['addressStreet']),
+      position: LatLng(object['latitude'], object['longitude']),
+      infoWindow: InfoWindow(
+          title: object['addressStreet'],
+          snippet: 'Metro Bikes Left: ${object['bikesAvailable']}'
+      ),
+    );
+
+    setState(() {
+      // adding a new marker to set
+      _markers.add(marker);
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(

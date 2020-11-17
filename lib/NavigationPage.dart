@@ -1,6 +1,3 @@
-import 'package:http/http.dart' as superagent;
-import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:safe_ways/CurrentLocation.dart';
 import 'package:safe_ways/Directions.dart';
@@ -9,31 +6,23 @@ import 'package:safe_ways/Paths.dart';
 import 'package:safe_ways/Stations.dart';
 
 class NavigationPage extends StatefulWidget {
+  List _stationData;
+
+  NavigationPage(this._stationData);
+
   @override
-  _NavigationPage createState() => _NavigationPage();
+  _NavigationPage createState() => _NavigationPage(this._stationData);
 }
 
 class _NavigationPage extends State<NavigationPage> {
   List _stationData;
   int _currentIndex = 0;
 
-  //method that returns metro bike share api data. superagent variable name is not JS superagent module. I just named it that
-  //because I like the name and wanted to create confusion, check the imports
-  Future getStationData() async{
-    superagent.Response response = await superagent.get('https://bikeshare.metro.net/stations/json/');
-    return json.decode(response.body)['features'];
-  }
+  _NavigationPage(this._stationData);
 
-  //this method is called in app startup. If you need any data or need to set data, this will be a pretty good place to start
-  //if you are using api's follow async/await promise procedure similar to JS
   @override
   void initState(){
     super.initState();
-    getStationData().then((value){
-      setState(() {
-        this._stationData = value;
-      });
-    });
   }
 
   //onTap in BottomNavigationBar is of type void Function (int) so this method is called everytime the navigation bar is pressed
@@ -46,6 +35,7 @@ class _NavigationPage extends State<NavigationPage> {
 
   //return widget of index that is called in bottom navigation bar
   Widget getPages(int index){
+    //_stationData is passed individually to any Page that needs it
     if(index == 0){
       return History();
     }
@@ -61,7 +51,7 @@ class _NavigationPage extends State<NavigationPage> {
     if(index == 4){
       return Directions();
     }
-    return NavigationPage();
+    return NavigationPage(this._stationData);
   }
 
 
