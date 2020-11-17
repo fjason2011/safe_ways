@@ -2,20 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:safe_ways/NavigationPage.dart';
 import 'package:safe_ways/delayed_animation.dart';
+import 'package:http/http.dart' as superagent;
+import 'dart:async';
+import 'dart:convert';
 
-//https://github.com/sagarshende23/Reflectly-Login-Screen
 //HomePage made using sagarshende23 Reflectly Login Screen splash page
+//https://github.com/sagarshende23/Reflectly-Login-Screen
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+  List _stationData; //Metro Bike Share API Data
   final int delayedAmount = 500;
   double _scale;
   AnimationController _controller;
   @override
   void initState() {
+    //Metro Bike Share API called here and saved to _stationData
+    getStationData().then((value){
+      setState(() {
+        this._stationData = value;
+      });
+    });
     _controller = AnimationController(
       vsync: this,
       duration: Duration(
@@ -27,6 +37,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       setState(() {});
     });
     super.initState();
+  }
+
+  Future getStationData() async{
+    superagent.Response response = await superagent.get('https://bikeshare.metro.net/stations/json/');
+    return json.decode(response.body)['features'];
   }
 
   @override
@@ -101,7 +116,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 DelayedAnimation(
                   child: GestureDetector(
                     onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationPage()));
+                      //_stationData is then given to NavigationPage so the data is ready by the time the person wants to navigate through the tabs.
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationPage(this._stationData)));
                     },
                     onTapDown: _onTapDown,
                     onTapUp: _onTapUp,
