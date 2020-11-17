@@ -43,7 +43,7 @@ class _CurrentLocation extends State<CurrentLocation> {
       _markers.add(Marker(
         markerId: MarkerId(this._stationData[i]['properties']['addressStreet']),
         draggable: false,
-        position: LatLng(this._stationData[i]['properties']['latitude'], this._stationData[i]['properties']['longitude'])
+        position: LatLng(this._stationData[i]['properties']['latitude'], this._stationData[i]['properties']['longitude']),
       ));
     }
     // _markers.add(Marker(
