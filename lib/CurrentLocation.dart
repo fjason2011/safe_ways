@@ -2,10 +2,9 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:location/location.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-
 
 
 class CurrentLocation extends StatefulWidget {
@@ -21,36 +20,23 @@ class CurrentLocation extends StatefulWidget {
 
 class _CurrentLocation extends State<CurrentLocation> {
   List _stationData = [];
+  List<Location> _searchLocations = [];
+  Position _currentPosition;
   List<Marker> _markers = [];
-  LatLng _initialPosition = LatLng(34.0522, -118.2437);
-  GoogleMapController _controller;
-  Location _location = Location();
+  GoogleMapController _mapController;
+  String _searchQuery;
 
   //_CurrentLocation constructor
   _CurrentLocation(this._stationData);
 
-  void _onMapCreated(GoogleMapController _ctrl) {
-    _controller = _ctrl;
-    _location.onLocationChanged.listen((event) {
-      _controller.animateCamera(
-          CameraUpdate.newCameraPosition(
-              CameraPosition(
-                  target: LatLng(event.latitude, event.longitude), zoom: 10)));
-    });
-  }
-
   @override
   void initState(){
-    setMarkers();
+    _getCurrentLocation();
+    _setMarkers();
     super.initState();
-    // _markers.add(Marker(
-    //     markerId: MarkerId('testMarker'),
-    //     draggable: false,
-    //     position: LatLng(34.0485, -118.25854)
-    // ));
   }
 
-  void setMarkers(){
+  void _setMarkers(){
     for(int i = 0; i < this._stationData.length; i++){
       _addMarker(this._stationData[i]['properties']);
     }
@@ -64,7 +50,7 @@ class _CurrentLocation extends State<CurrentLocation> {
   }
 
   Future<void> _addMarker(object) async {
-    final Uint8List markerIcon = await getBytesFromAsset('assets/bikemarker.png', 100);
+    final Uint8List markerIcon = await getBytesFromAsset('assets/bikemarker.png', 150);
 
     // creating a new MARKER
     final Marker marker = Marker(
@@ -82,18 +68,85 @@ class _CurrentLocation extends State<CurrentLocation> {
       _markers.add(marker);
     });
   }
-  
+
+  void _onMapCreated(controller){
+    setState(() {
+      _mapController = controller;
+    });
+  }
+
+  void _searchAndNavigate() async{
+    _searchLocations = await locationFromAddress(_searchQuery);
+    _mapController.animateCamera(
+      CameraUpdate.newCameraPosition(CameraPosition(
+          target: LatLng(_searchLocations[0].latitude, _searchLocations[0].longitude),
+          zoom: 25.0
+        )
+      )
+    );
+
+    /* UNHIGHLIGHT TO ENABLE MARKER SEARCH LOCATION
+    setState(() {
+      _markers.add(
+        Marker(
+          markerId: MarkerId('${_searchLocations[0].timestamp}'),
+          position:  LatLng(_searchLocations[0].latitude, _searchLocations[0].longitude)
+        )
+      );
+    });*/
+  }
+
+  void _getCurrentLocation() async{
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    setState(() {
+      _currentPosition = position;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: <Widget>[
           GoogleMap(
-            initialCameraPosition:
-            CameraPosition(target: _initialPosition, zoom: 10),
+            initialCameraPosition: CameraPosition(
+              target: LatLng(_currentPosition.latitude, _currentPosition.longitude),
+              zoom: 15.0,
+            ),
             onMapCreated: _onMapCreated,
             myLocationEnabled: true,
             markers: Set.from(_markers),
+            mapType: MapType.normal,
+          ),
+          Positioned(
+              top: 55.0,
+              right: 15.0,
+              left: 15.0,
+              child: Container(
+                height: 50.0,
+                  width:  double.infinity,
+                decoration:  BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  color:  Colors.white
+                ),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search Address',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.only(left: 15.0, top:15.0),
+                    suffixIcon:  IconButton(
+                      icon: Icon(Icons.search),
+                      onPressed: _searchAndNavigate,
+                      iconSize:  30.0,
+                    )
+                  ),
+                  onChanged: (value){
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+                ),
+              ),
           ),
         ],
       ),
