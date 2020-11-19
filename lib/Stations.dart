@@ -31,7 +31,8 @@ class _Stations extends State<Stations>{
   Widget build(BuildContext context){
     return Scaffold(
         appBar: AppBar(
-            title: Text("Metro Bike Stations")
+            title: Text("Metro Bike Stations"),
+            backgroundColor: Color.fromRGBO(14, 136, 78, 1.0),
         ),
         body: ListView.builder(
           itemCount: _stationData == null ? 0 : _stationData.length,
